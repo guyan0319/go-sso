@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"net"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -87,4 +89,29 @@ func OrderUniqueId() string {
 	cur := time.Now()
 	timestamps := cur.UnixNano() / 1000000 //获取毫秒
 	return strconv.FormatInt(timestamps, 10) + GetRandomNum(5)
+}
+
+func IpStringToInt(ipstring string) int {
+	if net.ParseIP(ipstring)==nil {
+		return 0
+	}
+	ipSegs := strings.Split(ipstring, ".")
+	var ipInt int = 0
+	var pos uint = 24
+	for _, ipSeg := range ipSegs {
+		tempInt, _ := strconv.Atoi(ipSeg)
+		tempInt = tempInt << pos
+		ipInt = ipInt | tempInt
+		pos -= 8
+	}
+	return ipInt
+}
+
+func IpIntToString(ipInt int) string{
+	var bytes [4]byte
+	bytes[0] = byte(ipInt & 0xFF)
+	bytes[1] = byte((ipInt >> 8) & 0xFF)
+	bytes[2] = byte((ipInt >> 16) & 0xFF)
+	bytes[3] = byte((ipInt >> 24) & 0xFF)
+	return net.IPv4(bytes[3], bytes[2], bytes[1], bytes[0]).String()
 }

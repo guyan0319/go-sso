@@ -13,7 +13,6 @@ func main() {
 
 	//初始化数据验证
 	handle.InitValidate()
-
 	//gin.SetMode(gin.DebugMode)//开发环境
 	gin.SetMode(gin.ReleaseMode) //线上环境
 	r := gin.Default()
@@ -29,7 +28,6 @@ func main() {
 
 		//fmt.Println("header \r\n",c.Request.Header)
 
-
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
@@ -42,10 +40,3 @@ func Load() {
 	conf.Set(c)
 }
 
-func GetClientIp(c *gin.Context) string{
-	ip:=c.ClientIP()
-	if ip=="::1" {
-		ip="127.0.0.1"
-	}
-	return ip
-}

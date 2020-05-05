@@ -5,6 +5,7 @@ import (
 	"go-sso/models"
 	"go-sso/utils/common"
 	"go-sso/utils/handle"
+	"go-sso/utils/request"
 	"go-sso/utils/response"
 	"time"
 )
@@ -73,8 +74,8 @@ func SignupByPhone(c *gin.Context)  {
 	model.Ctime=time.Now().Second()
 	model.Status=models.UsersStatusOk
 
-	//traceModel := models.Trace{Ctime:model.Ctime}
-	//
+	traceModel := models.Trace{Ctime:model.Ctime}
+	traceModel.Ip=request.GetClientIp(c)
 	//c.Request.RemoteAddr
 
 
