@@ -9,12 +9,15 @@ import (
 	"go-sso/utils/response"
 	"time"
 )
+
 type UserPhone struct {
-	Phone   string `form:"phone" json:"phone" binding:"required"`
-	Passwd   string `form:"passwd" json:"passwd" binding:"required,max=20,min=6"`
+	Phone  string `form:"phone" json:"phone" binding:"required"`
+	Passwd string `form:"passwd" json:"passwd" binding:"required,max=20,min=6"`
 	Code   string `form:"code" json:"code" binding:"required,len=6"`
 }
-var  UserPhoneTrans =map[string]string{"Phone":"手机号","Passwd":"密码","Code":"验证码"}
+
+var UserPhoneTrans = map[string]string{"Phone": "手机号", "Passwd": "密码", "Code": "验证码"}
+
 func Login(c *gin.Context) {
 
 	//var u User
@@ -56,29 +59,34 @@ func Login(c *gin.Context) {
 	//response.ShowData(c, data)
 	return
 }
-func SignupByPhone(c *gin.Context)  {
+func SignupByPhone(c *gin.Context) {
 	var userPhone UserPhone
 	if err := c.BindJSON(&userPhone); err != nil {
-		msg:=handle.TransTagName(&UserPhoneTrans,err)
-		response.ShowValidatorError(c,msg)
+		msg := handle.TransTagName(&UserPhoneTrans, err)
+		response.ShowValidatorError(c, msg)
 		return
 	}
-	model:=models.Users{Phone:userPhone.Phone}
-	if has:=model.GetRow(); has{
+	model := models.Users{Phone: userPhone.Phone}
+	if has := model.GetRow(); has {
 		response.ShowError(c, "phone_exists")
 		return
 	}
 
-	model.Salt=common.GetRandomBoth(4)
-	model.Passwd = common.Sha1En(userPhone.Passwd+model.Salt)
-	model.Ctime=time.Now().Second()
-	model.Status=models.UsersStatusOk
+	model.Salt = common.GetRandomBoth(4)
+	model.Passwd = common.Sha1En(userPhone.Passwd + model.Salt)
+	model.Ctime = time.Now().Second()
+	model.Status = models.UsersStatusOk
 
-	traceModel := models.Trace{Ctime:model.Ctime}
-	traceModel.Ip=request.GetClientIp(c)
-	//c.Request.RemoteAddr
+	traceModel := models.Trace{Ctime: model.Ctime}
+	traceModel.Ip = common.IpStringToInt(request.GetClientIp(c))
+	traceModel.Type = models.TraceTypeReg
+	deviceModel := models.Device{Ctime: model.Ctime, Ip: traceModel.Ip}
 
-
-	response.ShowSuccess(c,"success")
+	_, err := model.Add(&traceModel, &deviceModel)
+	if err != nil {
+		response.ShowError(c, "fail")
+		return
+	}
+	response.ShowSuccess(c, "success")
 	return
 }
