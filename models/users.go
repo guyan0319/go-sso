@@ -16,59 +16,45 @@ type Users struct {
 	Salt   string    `json:"salt" xorm:"not null comment('盐值') CHAR(4)"`
 	Status int       `json:"status" xorm:"not null default 0 comment('状态（0：未审核,1:通过 10删除）') TINYINT(4)"`
 }
-var UsersStatusOk =1
-var UsersStatusDel =10
-var UsersStatusDef =0
-func(u *Users) GetRow() bool {
+
+var UsersStatusOk = 1
+var UsersStatusDel = 10
+var UsersStatusDef = 0
+
+func (u *Users) GetRow() bool {
 	has, err := mEngine.Get(u)
-	if err==nil &&  has  {
+	if err == nil && has {
 		return true
 	}
 	return false
 }
-func (u *Users) GetAll()([]Users,error) {
-	var users[]Users
-	err:=mEngine.Find(&users)
-	return users,err
+func (u *Users) GetAll() ([]Users, error) {
+	var users []Users
+	err := mEngine.Find(&users)
+	return users, err
 }
 
-func (u *Users) Add(roles []interface{}) (int64 ,error){
+func (u *Users) Add(trace *Trace, device *Device) (int64, error) {
 	session := mEngine.NewSession()
 	defer session.Close()
 	// add Begin() before any action
 	if err := session.Begin(); err != nil {
-		// if returned then will rodefer session.Close()llback automatically
-		return 0,err
+		return 0, err
 	}
-	//var uid int64
-	_,err:=session.Insert(u)
-	if err!=nil {
-		return 0,err
+	_, err := session.Insert(u)
+	if err != nil {
+		return 0, err
 	}
 
-	//
-	//
-	//for _,k:=range roles{
-	//	roleModel:=SystemRole{Name:k.(string)}
-	//	has:=roleModel.GetRow()
-	//	if !has {
-	//		continue
-	//	}
-	//	if	roleModel.Status==0{
-	//		continue
-	//	}
-	//	userroleModel:=SystemUserRole{SystemRoleId:roleModel.Id,SystemUserId:u.Id}
-	//	has,err:=session.Get(&userroleModel)
-	//	if err!=nil {
-	//		return 0,err
-	//	}
-	//	if has {
-	//		continue
-	//	}
-	//	_,err=session.Insert(&userroleModel)
-	//	if err!=nil {
-	//		return 0,err
-	//	}
-	//}
-	return u.Id,session.Commit()
+	trace.Uid = u.Id
+	_, err = session.Insert(trace)
+	if err != nil {
+		return 0, err
+	}
+	device.Uid = u.Id
+	_, err = session.Insert(trace)
+	if err != nil {
+		return 0, err
+	}
+	return u.Id, session.Commit()
 }
