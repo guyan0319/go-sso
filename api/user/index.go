@@ -87,6 +87,7 @@ func SignupByPhone(c *gin.Context) {
 		response.ShowError(c, "fail")
 		return
 	}
+
 	response.ShowSuccess(c, "success")
 	return
 }
