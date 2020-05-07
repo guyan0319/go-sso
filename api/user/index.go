@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-sso/models"
 	"go-sso/utils/common"
@@ -71,22 +72,32 @@ func SignupByPhone(c *gin.Context) {
 		response.ShowError(c, "phone_exists")
 		return
 	}
+	//验证code
+	//if sms.SmsCheck("code"+userPhone.Phone,userPhone.Code) {
+	//	response.ShowError(c, "code_error")
+	//	return
+	//}
 
 	model.Salt = common.GetRandomBoth(4)
 	model.Passwd = common.Sha1En(userPhone.Passwd + model.Salt)
-	model.Ctime = time.Now().Second()
+	model.Ctime = int(time.Now().Unix())
 	model.Status = models.UsersStatusOk
+	model.Mtime = time.Now()
 
 	traceModel := models.Trace{Ctime: model.Ctime}
 	traceModel.Ip = common.IpStringToInt(request.GetClientIp(c))
 	traceModel.Type = models.TraceTypeReg
+
 	deviceModel := models.Device{Ctime: model.Ctime, Ip: traceModel.Ip}
 
 	_, err := model.Add(&traceModel, &deviceModel)
 	if err != nil {
+		fmt.Println(err)
 		response.ShowError(c, "fail")
 		return
 	}
+
+
 
 	response.ShowSuccess(c, "success")
 	return

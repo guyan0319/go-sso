@@ -7,11 +7,8 @@ import (
 
 func main() {
 	ip:="13.13.13.12"
-	intv:=common.IpStringToInt(ip)
-	fmt.Println(intv)
-	fmt.Println(common.IpStringToInt(ip))
-
-
-	fmt.Println(common.IpIntToString(intv))
+	fmt.Println(common.Sha1En(ip))
+	fmt.Println(common.Sha1En1(ip))
+	fmt.Println(common.Md5En(ip))
 }
 
