@@ -72,6 +72,7 @@ func SignupByPhone(c *gin.Context) {
 		response.ShowError(c, "phone_exists")
 		return
 	}
+
 	//验证code
 	//if sms.SmsCheck("code"+userPhone.Phone,userPhone.Code) {
 	//	response.ShowError(c, "code_error")
@@ -96,8 +97,6 @@ func SignupByPhone(c *gin.Context) {
 		response.ShowError(c, "fail")
 		return
 	}
-
-
 
 	response.ShowSuccess(c, "success")
 	return
