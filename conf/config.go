@@ -10,6 +10,7 @@ type Config struct {
 	Super string
 	RedisPre string
 	Host string
+	OpenJwt bool
 	Routes []string
 }
 var (
@@ -20,7 +21,7 @@ var (
 
 func  Set(cfg Config) {
 	mutex.Lock()
-	Cfg.RedisPre=setDefault(cfg.RedisPre,"","go.admin.redis")
+	Cfg.RedisPre=setDefault(cfg.RedisPre,"","go.sso.redis")
 	Cfg.Language=setDefault(cfg.Language,"","cn")
 	Cfg.Token=setDefault(cfg.Token,"","token")
 	Cfg.Super=setDefault(cfg.Super,"","admin")//超级账户
