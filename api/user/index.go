@@ -61,10 +61,19 @@ func Login(c *gin.Context) {
 	//response.ShowData(c, data)
 	return
 }
+//发送短信验证码
+func SendSms(c *gin.Context) {
+
+
+
+
+}
+//手机号注册
 func SignupByPhone(c *gin.Context) {
 	var userPhone UserPhone
 	if err := c.BindJSON(&userPhone); err != nil {
 		msg := handle.TransTagName(&UserPhoneTrans, err)
+		fmt.Println(msg)
 		response.ShowValidatorError(c, msg)
 		return
 	}

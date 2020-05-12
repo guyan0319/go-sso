@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-sso/api"
 	"go-sso/api/user"
 	"go-sso/conf"
 	"go-sso/modules/app"
 	"go-sso/utils/handle"
+	"log"
 )
 
 func main() {
@@ -16,16 +18,17 @@ func main() {
 	//gin.SetMode(gin.DebugMode)//开发环境
 	gin.SetMode(gin.ReleaseMode) //线上环境
 	r := gin.Default()
-
+	r.Use(Auth)
 	//r.POST("/logout", user.Logout)
 	//r.POST("/login", user.Login)
 	//r.POST("/reg", user.Reg)
+	r.POST("/sendsms", user.Reg)
 	r.POST("/signup/phone", user.SignupByPhone)
 	r.GET("/", api.Index)
 	r.GET("/pong", func(c *gin.Context) {
-
-		tokenString :="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjcsImV4cCI6MTU4OTIxNTI4NH0.JAeukEGhUFIhEsFjJ12UGHsMsBGW1xYhqRuRlyMlmRc"
-		app.ParseToken(tokenString)
+		fmt.Println(c.Request.TLS)
+		fmt.Println(c.Request.Proto)
+		fmt.Println(	c.GetHeader(app.HEADER_FORWARDED_PROTO))
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
@@ -35,6 +38,52 @@ func main() {
 func Load() {
 	c := conf.Config{}
 	c.Routes=[]string{"/ping","/login"}
+	c.OpenJwt=true//开启jwt
 	conf.Set(c)
 }
 
+func Auth(c *gin.Context){
+	//u,err:= url.Parse(c.Request.RequestURI)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//if common.InArrayString(u.Path,&conf.Cfg.Routes) {
+	//	//c.Next()
+	//	return
+	//}
+	//session := sessions.Default(c)
+	//v := session.Get(conf.Cfg.Token)
+	//if v==nil {
+	//	c.Abort()
+	//	response.ShowError(c,"nologin")
+	//	return
+	//}
+	//uid:=session.Get(v)
+	//users := models.SystemUser{Id:uid.(int),Status:1}
+	//has:=users.GetRow()
+	//if !has {
+	//	c.Abort()
+	//	response.ShowError(c,"user_error")
+	//	return
+	//}
+	////特殊账号
+	//if users.Name==conf.Cfg.Super {
+		c.Next()
+		return
+	//}
+	//menuModel:=models.SystemMenu{}
+	//menuMap,err:=menuModel.GetRouteByUid(uid)
+	//if err!=nil {
+	//	c.Abort()
+	//	response.ShowError(c,"unauthorized")
+	//	return
+	//}
+	//if _,ok:=menuMap[u.Path] ;!ok{
+	//	c.Abort()
+	//	response.ShowError(c,"unauthorized")
+	//	return
+	//}
+	// access the status we are sending
+	status := c.Writer.Status()
+	log.Println(status) //状态 200
+}
