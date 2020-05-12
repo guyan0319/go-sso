@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-sso/models"
+	"go-sso/modules/app"
 	"go-sso/utils/common"
 	"go-sso/utils/handle"
 	"go-sso/utils/request"
@@ -72,7 +73,6 @@ func SignupByPhone(c *gin.Context) {
 		response.ShowError(c, "phone_exists")
 		return
 	}
-
 	//验证code
 	//if sms.SmsCheck("code"+userPhone.Phone,userPhone.Code) {
 	//	response.ShowError(c, "code_error")
@@ -89,7 +89,7 @@ func SignupByPhone(c *gin.Context) {
 	traceModel.Ip = common.IpStringToInt(request.GetClientIp(c))
 	traceModel.Type = models.TraceTypeReg
 
-	deviceModel := models.Device{Ctime: model.Ctime, Ip: traceModel.Ip}
+	deviceModel := models.Device{Ctime: model.Ctime, Ip: traceModel.Ip,Client:c.GetHeader("User-Agent")}
 
 	_, err := model.Add(&traceModel, &deviceModel)
 	if err != nil {
@@ -97,7 +97,12 @@ func SignupByPhone(c *gin.Context) {
 		response.ShowError(c, "fail")
 		return
 	}
-
+	err = app.DoLogin(c,model)
+	if err != nil {
+		fmt.Println(err)
+		response.ShowError(c, "fail")
+		return
+	}
 	response.ShowSuccess(c, "success")
 	return
 }
