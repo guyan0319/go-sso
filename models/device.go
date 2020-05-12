@@ -9,3 +9,5 @@ type Device struct {
 	Model  string `json:"model" xorm:"not null default '' comment('设备型号') VARCHAR(50)"`
 	Uid    int64  `json:"uid" xorm:"not null default 0 comment('用户主键') index BIGINT(20)"`
 }
+
+

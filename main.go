@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-sso/api"
 	"go-sso/api/user"
 	"go-sso/conf"
+	"go-sso/modules/app"
 	"go-sso/utils/handle"
 )
 
@@ -24,10 +24,8 @@ func main() {
 	r.GET("/", api.Index)
 	r.GET("/pong", func(c *gin.Context) {
 
-		fmt.Println(c.ClientIP())
-
-		//fmt.Println("header \r\n",c.Request.Header)
-
+		tokenString :="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjcsImV4cCI6MTU4OTIxNTI4NH0.JAeukEGhUFIhEsFjJ12UGHsMsBGW1xYhqRuRlyMlmRc"
+		app.ParseToken(tokenString)
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
