@@ -9,6 +9,9 @@ import (
 	"go-sso/utils/handle"
 	"go-sso/utils/request"
 	"go-sso/utils/response"
+	"go-sso/utils/sms"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -17,6 +20,11 @@ type UserPhone struct {
 	Passwd string `form:"passwd" json:"passwd" binding:"required,max=20,min=6"`
 	Code   string `form:"code" json:"code" binding:"required,len=6"`
 }
+type Phone struct {
+	Phone  string `form:"phone" json:"phone" binding:"required"`
+}
+
+var PhoneTrans = map[string]string{"Phone": "手机号"}
 
 var UserPhoneTrans = map[string]string{"Phone": "手机号", "Passwd": "密码", "Code": "验证码"}
 
@@ -63,9 +71,28 @@ func Login(c *gin.Context) {
 }
 //发送短信验证码
 func SendSms(c *gin.Context) {
-
-
-
+	var p Phone
+	if err := c.BindJSON(&p); err != nil {
+		msg := handle.TransTagName(&PhoneTrans, err)
+		response.ShowValidatorError(c, msg)
+		return
+	}
+	reg := `^1\d{10}$`
+	rgx := regexp.MustCompile(reg)
+	if !rgx.MatchString(p.Phone) {
+			response.ShowError(c, "phone_error")
+			return
+	}
+	//生成随机数
+	code := common.GetRandomNum(6)
+	msg := strings.Replace(sms.SMSTPL, "[code]", code, 1)
+	err:=sms.SendSms(p.Phone,msg)
+	if err!=nil {
+		response.ShowError(c, "fail")
+		return
+	}
+	response.ShowError(c, "success")
+	return
 
 }
 //手机号注册

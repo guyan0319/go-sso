@@ -20,9 +20,8 @@ func main() {
 	r := gin.Default()
 	r.Use(Auth)
 	//r.POST("/logout", user.Logout)
-	//r.POST("/login", user.Login)
-	//r.POST("/reg", user.Reg)
-	r.POST("/sendsms", user.Reg)
+	r.POST("/login/phone", user.Login)
+	r.POST("/sendsms", user.SendSms)
 	r.POST("/signup/phone", user.SignupByPhone)
 	r.GET("/", api.Index)
 	r.GET("/pong", func(c *gin.Context) {
