@@ -12,7 +12,7 @@ type Users struct {
 	Mtime  time.Time `json:"mtime" xorm:"not null default 'CURRENT_TIMESTAMP' comment('修改时间') TIMESTAMP"`
 	Name   string    `json:"name" xorm:"not null default '' comment('用户名') VARCHAR(50)"`
 	Passwd string    `json:"passwd" xorm:"not null comment('密码') VARCHAR(50)"`
-	Phone  string    `json:"phone" xorm:"not null default '' comment('手机号') VARCHAR(20)"`
+	Mobile  string    `json:"mobile" xorm:"not null default '' comment('手机号') VARCHAR(20)"`
 	Salt   string    `json:"salt" xorm:"not null comment('盐值') CHAR(4)"`
 	Status int       `json:"status" xorm:"not null default 0 comment('状态（0：未审核,1:通过 10删除）') TINYINT(4)"`
 }
@@ -58,7 +58,7 @@ func (u *Users) Add(trace *Trace, device *Device) (int64, error) {
 	}
 	return u.Id, session.Commit()
 }
-func IsExistsPhone(phone string) bool {
-	model := Users{Phone: phone}
+func IsExistsMobile(mobile string) bool {
+	model := Users{Mobile: mobile}
 	return model.GetRow()
 }

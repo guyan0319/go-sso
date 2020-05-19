@@ -31,8 +31,6 @@ func DoLogin(c *gin.Context,user models.Users)  error{
 	id:=strconv.Itoa(int(user.Id))
 	secure:=IsHttps(c)
 	c.SetCookie(COOKIE_TOKEN,id,maxAge,"/", "",	 secure,true)
-
-
 	return nil
 }
 func IsHttps(c *gin.Context) bool {
