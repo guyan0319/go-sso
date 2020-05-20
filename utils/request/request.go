@@ -1,6 +1,10 @@
 package request
 
-import "github.com/gin-gonic/gin"
+import (
+	"encoding/json"
+	"github.com/gin-gonic/gin"
+	"io/ioutil"
+)
 
 func GetClientIp(c *gin.Context) string{
 	ip:=c.ClientIP()
@@ -9,3 +13,10 @@ func GetClientIp(c *gin.Context) string{
 	}
 	return ip
 }
+func GetJson(c *gin.Context) (map[string]interface{},error ){
+	jsonstr, _ := ioutil.ReadAll(c.Request.Body)
+	var data map[string]interface{}
+	err := json.Unmarshal(jsonstr, &data)
+	return data,err
+}
+

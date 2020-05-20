@@ -37,49 +37,9 @@ var MobileTrans = map[string]string{"mobile": "手机号"}
 
 var UserMobileTrans = map[string]string{"Mobile": "手机号", "Passwd": "密码", "Code": "验证码"}
 
-func Login(c *gin.Context) {
 
-	//var u User
-	//err :=c.BindJSON(&u)
-	//if err!=nil	{
-	//	response.ShowError(c, "fail")
-	//	return
-	//}
-	//if u.Username == "" || u.Password == "" {
-	//	response.ShowError(c, "fail")
-	//	return
-	//}
-	//user := models.SystemUser{Name: u.Username}
-	//has := user.GetRow()
-	//if !has {
-	//	response.ShowError(c, "fail")
-	//	return
-	//}
-	//if common.Sha1En(u.Password+user.Salt) != user.Password {
-	//	response.ShowError(c, "fail")
-	//	return
-	//}
-	//session := sessions.Default(c)
-	//var data = make(map[string]interface{}, 0)
-	//v := session.Get(conf.Cfg.Token)
-	//fmt.Println(v)
-	//if v == nil {
-	//	cur := time.Now()
-	//	//纳秒
-	//	timestamps := cur.UnixNano()
-	//	times := strconv.FormatInt(timestamps, 10)
-	//	v = common.Md5En(common.GetRandomString(16) + times)
-	//	session.Set(conf.Cfg.Token, v)
-	//	session.Set(v, user.Id)
-	//	err=session.Save()
-	//	fmt.Println("设置成功")
-	//}
-	//data[conf.Cfg.Token] = v
-	//response.ShowData(c, data)
-	return
-}
 //手机密码
-func LoginByMobile(c *gin.Context) {
+func Login(c *gin.Context) {
 	var userMobile UserMobilePasswd
 	if err := c.BindJSON(&userMobile); err != nil {
 		msg := handle.TransTagName(&UserMobileTrans, err)
@@ -107,15 +67,38 @@ func LoginByMobile(c *gin.Context) {
 }
 //手机验证码登录
 func LoginByMobileCode(c *gin.Context) {
-
-
+	var userMobile UserMobileCode
+	if err := c.BindJSON(&userMobile); err != nil {
+		msg := handle.TransTagName(&UserMobileTrans, err)
+		fmt.Println(msg)
+		response.ShowValidatorError(c, msg)
+		return
+	}
+	//验证code
+	if sms.SmsCheck("code"+userMobile.Mobile,userMobile.Code) {
+		response.ShowError(c, "code_error")
+		return
+	}
+	model := models.Users{Mobile: userMobile.Mobile}
+	if has := model.GetRow(); !has {
+		response.ShowError(c, "mobile_not_exists")
+		return
+	}
+	err := app.DoLogin(c,model)
+	if err != nil {
+		fmt.Println(err)
+		response.ShowError(c, "fail")
+		return
+	}
+	response.ShowSuccess(c, "success")
+	return
+}
+func MobileIsExists(c *gin.Context)  {
 
 
 
 
 }
-
-
 //发送短信验证码
 func SendSms(c *gin.Context) {
 	var p Mobile

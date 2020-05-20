@@ -20,7 +20,7 @@ func main() {
 	r := gin.Default()
 	r.Use(Auth)
 	//r.POST("/logout", user.Logout)
-	r.POST("/login/mobile", user.LoginByMobile)
+	r.POST("/login", user.LoginByMobile)
 	r.POST("/login/mobile", user.LoginByMobileCode)
 	r.POST("/sendsms", user.SendSms)
 	r.POST("/signup/mobile", user.SignupByMobile)
