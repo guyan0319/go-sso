@@ -10,7 +10,7 @@ import (
 	"go-sso/utils/request"
 	"go-sso/utils/response"
 	"go-sso/utils/sms"
-	"regexp"
+	"go-sso/utils/validator"
 	"strings"
 	"time"
 )
@@ -107,11 +107,9 @@ func SendSms(c *gin.Context) {
 		response.ShowValidatorError(c, msg)
 		return
 	}
-	reg := `^1\d{10}$`
-	rgx := regexp.MustCompile(reg)
-	if !rgx.MatchString(p.Mobile) {
-			response.ShowError(c, "mobile_error")
-			return
+	if ! validator.CheckMobile(p.Mobile) {
+		response.ShowError(c, "mobile_error")
+		return
 	}
 	//生成随机数
 	code := common.GetRandomNum(6)
