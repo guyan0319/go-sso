@@ -20,7 +20,6 @@ func ShowValidatorError(c *gin.Context, msg interface{}){
 	})
 }
 
-
 func ShowErrorParams(c *gin.Context, msg string){
 	msg = msg+lang.Get("not_exists")
 	c.JSON(http.StatusOK, gin.H{

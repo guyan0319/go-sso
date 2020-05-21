@@ -65,6 +65,13 @@ func Login(c *gin.Context) {
 	response.ShowSuccess(c, "success")
 	return
 }
+//退出登录
+func Logout(c *gin.Context) {
+	secure:=app.IsHttps(c)
+	c.SetCookie(app.COOKIE_TOKEN,"",-1,"/", "",secure,true)
+	response.ShowSuccess(c, "success")
+	return
+}
 
 //手机验证码登录
 func LoginByMobileCode(c *gin.Context) {
@@ -102,7 +109,17 @@ func MobileIsExists(c *gin.Context) {
 		response.ShowValidatorError(c, msg)
 		return
 	}
-
+	if !verify.CheckMobile(userMobile.Mobile) {
+		response.ShowError(c, "mobile_error")
+		return
+	}
+	model := models.Users{Mobile: userMobile.Mobile}
+	var data =map[string]bool{"is_exist":true}
+	if has := model.GetRow(); !has {
+		data["is_exist"] = false
+	}
+	response.ShowData(c,data)
+	return
 }
 
 //发送短信验证码

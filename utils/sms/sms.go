@@ -4,10 +4,10 @@ import (
 	"errors"
 	"github.com/gomodule/redigo/redis"
 	"go-sso/utils/cache"
+	"go-sso/utils/verify"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"regexp"
 	"unicode/utf8"
 )
 
@@ -65,10 +65,7 @@ func SendSms(mobile, msg string) error {
 	if mobile == "" {
 		return errors.New("mobile is not null")
 	}
-
-	reg := `^1\d{10}$`
-	rgx := regexp.MustCompile(reg)
-	if !rgx.MatchString(mobile) {
+	if !verify.CheckMobile(mobile) {
 		return errors.New("mobile is irregular")
 	}
 	if utf8.RuneCountInString(msg) < 10 {

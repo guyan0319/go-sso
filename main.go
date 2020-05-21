@@ -19,11 +19,12 @@ func main() {
 	gin.SetMode(gin.ReleaseMode) //线上环境
 	r := gin.Default()
 	r.Use(Auth)
-	//r.POST("/logout", user.Logout)
-	r.POST("/login", user.LoginByMobile)
+	r.POST("/logout", user.Logout)
+	r.POST("/login", user.Login)
 	r.POST("/login/mobile", user.LoginByMobileCode)
 	r.POST("/sendsms", user.SendSms)
 	r.POST("/signup/mobile", user.SignupByMobile)
+	r.POST("/signup/mobile/exist", user.MobileIsExists)
 	r.GET("/", api.Index)
 	r.GET("/pong", func(c *gin.Context) {
 		fmt.Println(c.Request.TLS)
@@ -43,6 +44,16 @@ func Load() {
 }
 
 func Auth(c *gin.Context){
+    id,err:=c.Cookie(app.COOKIE_TOKEN)
+    if err!=nil{
+		panic(err)
+	}
+	if id!="" {
+
+	}
+
+
+
 	//u,err:= url.Parse(c.Request.RequestURI)
 	//if err != nil {
 	//	panic(err)
