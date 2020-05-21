@@ -11,8 +11,7 @@ import (
 	"unicode/utf8"
 )
 
-const
-(
+const (
 	SMSTPL = "【xxxx】您正在申请手机注册，验证码为：[code]，若非本人操作请忽略！"
 	//账号
 	ACCOUNT = "***************"
@@ -66,6 +65,7 @@ func SendSms(mobile, msg string) error {
 	if mobile == "" {
 		return errors.New("mobile is not null")
 	}
+
 	reg := `^1\d{10}$`
 	rgx := regexp.MustCompile(reg)
 	if !rgx.MatchString(mobile) {
@@ -75,7 +75,7 @@ func SendSms(mobile, msg string) error {
 		return errors.New("Character length is not enough.")
 	}
 	//不同信道参数可能不同，具体查看其开发文档
-	data_send := url.Values{"account": {ACCOUNT}, "pswd": {PSWD},"mobile": {mobile},"msg":{msg},}
+	data_send := url.Values{"account": {ACCOUNT}, "pswd": {PSWD}, "mobile": {mobile}, "msg": {msg}}
 	_, err := HttpPostForm(URL, data_send)
 	return err
 }
