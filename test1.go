@@ -2,87 +2,56 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-playground/locales/zh"
-	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
-	"net/http"
-	"reflect"
-	"regexp"
-	"strconv"
+	"github.com/dgrijalva/jwt-go"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 )
-var trans ut.Translator
-// Booking contains binded and validated data.
-type Booking struct {
-	CheckIn  time.Time `form:"check_in" json:"check_in" binding:"required,bookabledate" time_format:"2006-01-02" label:"输入时间"`
-	CheckOut time.Time `form:"check_out" json:"check_out" binding:"required,gtfield=CheckIn" time_format:"2006-01-02" label:"输出时间"`
-}
-
-var bookableDate validator.Func = func(fl validator.FieldLevel) bool {
-	date, ok := fl.Field().Interface().(time.Time)
-	if ok {
-		today := time.Now()
-		if today.After(date) {
-			return false
-		}
-	}
-	return true
-}
-
-func checkMobile(fl validator.FieldLevel) bool {
-	mobile := strconv.Itoa(int(fl.Field().Uint()))
-	re := `^1\d{10}$`
-	r := regexp.MustCompile(re)
-	return r.MatchString(mobile)
+const (
+	SECRETKEY = "243223ffslsfsldfl412fdsfsdf"//私钥
+)
+//自定义Claims
+type CustomClaims struct {
+	UserId int64
+	jwt.StandardClaims
 }
 func main() {
-	route := gin.Default()
-	uni := ut.New(zh.New())
-	trans, _ = uni.GetTranslator("zh")
+	//生成token
+	maxAge:=60*60*24
 
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		//注册翻译器
-		_= zh_translations.RegisterDefaultTranslations(v, trans)
-		//注册自定义函数
-		_=v.RegisterValidation("bookabledate", bookableDate)
-
-		//注册一个函数，获取struct tag里自定义的label作为字段名
-		v.RegisterTagNameFunc(func(fld reflect.StructField) string {
-			name:=fld.Tag.Get("label")
-			return name
-		})
-		//根据提供的标记注册翻译
-		v.RegisterTranslation("bookabledate", trans, func(ut ut.Translator) error {
-			return ut.Add("bookabledate", "{0}不能早于当前时间或{1}格式错误!", true)
-		}, func(ut ut.Translator, fe validator.FieldError) string {
-			t, _ := ut.T("bookabledate", fe.Field(), fe.Field())
-			return t
-		})
-
-
-		
-
+	// Create the Claims
+	claims := &jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(time.Duration(maxAge)*time.Second).Unix(), // 过期时间，必须设置,
+		Issuer:    "jerry",// 非必须，也可以填充用户名，
 	}
-	route.GET("/bookable", getBookable)
-	route.Run(":8085")
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(SECRETKEY)
+	if err!=nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("token: %v\n", tokenString)
+
+	//解析token
+	ret,err :=ParseToken(tokenString)
+	if err!=nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("userinfo: %v\n", ret)
 }
 
-func getBookable(c *gin.Context) {
-	var b Booking
-	if err := c.ShouldBindWith(&b, binding.Query); err == nil {
-		c.JSON(http.StatusOK, gin.H{"message": "Booking dates are valid!"})
-	} else {
-		errs := err.(validator.ValidationErrors)
+//解析token
+func ParseToken(tokenString string)(*CustomClaims,error)  {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
 
-		fmt.Println(errs.Translate(trans))
-		//for _, e := range errs {
-		//	// can translate each error one at a time.
-		//	fmt.Println(e.Translate(trans))
-		//}
-		c.JSON(http.StatusBadRequest, gin.H{"error": errs.Translate(trans)})
+		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
+		return []byte(SECRETKEY), nil
+	})
+	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+		return claims,nil
+	} else {
+		return nil,err
 	}
 }
