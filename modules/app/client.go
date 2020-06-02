@@ -1,7 +1,8 @@
 package app
 
 const (
-	HEADER_TOKEN           = "Token"
+	ACCESS_TOKEN           = "Access_Token"
+	REFRESH_TOKEN           = "Rfresh_Token"
 	COOKIE_TOKEN           = "UserId"
 	HEADER_AUTH            = "Authorization"
 	HEADER_ETAG_SERVER     = "ETag"

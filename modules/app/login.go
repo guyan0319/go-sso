@@ -22,7 +22,7 @@ func DoLogin(c *gin.Context,user models.Users)  error{
 		if err != nil {
 			return err
 		}
-		c.Header(HEADER_TOKEN,accessToken)
+		c.Header(ACCESS_TOKEN,accessToken)
 	}
 	//claims,err:=ParseToken(accessToken)
 	//if err!=nil {

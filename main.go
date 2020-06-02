@@ -7,18 +7,22 @@ import (
 	"go-sso/api/user"
 	"go-sso/conf"
 	"go-sso/modules/app"
+	"go-sso/utils/common"
 	"go-sso/utils/handle"
+	"go-sso/utils/response"
 	"log"
+	"net/url"
 )
 
 func main() {
 
-	//初始化数据验证
-	handle.InitValidate()
+	//初始化数据
+	Load()
 	//gin.SetMode(gin.DebugMode)//开发环境
 	gin.SetMode(gin.ReleaseMode) //线上环境
 	r := gin.Default()
 	r.Use(Auth)
+	r.POST("/renewal", user.Logout)
 	r.POST("/logout", user.Logout)
 	r.POST("/login", user.Login)
 	r.POST("/login/mobile", user.LoginByMobileCode)
@@ -27,9 +31,6 @@ func main() {
 	r.POST("/signup/mobile/exist", user.MobileIsExists)
 	r.GET("/", api.Index)
 	r.GET("/pong", func(c *gin.Context) {
-		fmt.Println(c.Request.TLS)
-		fmt.Println(c.Request.Proto)
-		fmt.Println(	c.GetHeader(app.HEADER_FORWARDED_PROTO))
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
@@ -38,30 +39,60 @@ func main() {
 }
 func Load() {
 	c := conf.Config{}
-	c.Routes=[]string{"/ping","/login"}
+	c.Routes=[]string{"/ping","/renewal","/login","/login/mobile","/sendsms","/signup/mobile","/signup/mobile/exist"}
 	c.OpenJwt=true//开启jwt
 	conf.Set(c)
+	//初始化数据验证
+	handle.InitValidate()
 }
 
 func Auth(c *gin.Context){
-    id,err:=c.Cookie(app.COOKIE_TOKEN)
-    if err!=nil{
+	u,err:= url.Parse(c.Request.RequestURI)
+	if err != nil {
 		panic(err)
 	}
-	if id!="" {
+	if common.InArrayString(u.Path,&conf.Cfg.Routes) {
+		c.Next()
+		return
+	}
+	//开启jwt
+	if conf.Cfg.OpenJwt{
+		accessToken,err:=c.Cookie(app.ACCESS_TOKEN)
+		if err !=nil {
+			response.ShowError(c,"nologin")
+			return
+		}
+		ret,err:= app.ParseToken(accessToken)
+		if err!=nil {
+			response.ShowValidatorError(c,err)
+			return
+		}
+
+
+
 
 	}
+	fmt.Println(u)
+	_,err=c.Cookie(app.COOKIE_TOKEN)
+	if err==nil {
+			c.Next()
+			return
+	}
+
+	//
 
 
-
-	//u,err:= url.Parse(c.Request.RequestURI)
-	//if err != nil {
+    //id,err:=c.Cookie(app.COOKIE_TOKEN)
+    //if err!=nil{
 	//	panic(err)
 	//}
-	//if common.InArrayString(u.Path,&conf.Cfg.Routes) {
-	//	//c.Next()
-	//	return
+	//if id!="" {
+	//
 	//}
+
+
+
+
 	//session := sessions.Default(c)
 	//v := session.Get(conf.Cfg.Token)
 	//if v==nil {

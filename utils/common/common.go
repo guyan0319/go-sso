@@ -103,7 +103,15 @@ func OrderUniqueId() string {
 	timestamps := cur.UnixNano() / 1000000 //获取毫秒
 	return strconv.FormatInt(timestamps, 10) + GetRandomNum(5)
 }
-
+//查找某值是否在数组中
+func InArrayString(v string, m *[]string) bool {
+	for _, value := range *m {
+		if value == v {
+			return true
+		}
+	}
+	return false
+}
 func IpStringToInt(ipstring string) int {
 	if net.ParseIP(ipstring)==nil {
 		return 0
