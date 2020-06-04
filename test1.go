@@ -3,10 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"time"
 )
 const (
-	SECRETKEY = "243223ffslsfsldfl412fdsfsdf"//私钥
+	SECRETKEY = "42wqTE23123wffLU94342wgldgFs"//私钥
 )
 //自定义Claims
 type CustomClaims struct {
@@ -15,7 +14,7 @@ type CustomClaims struct {
 }
 func main() {
 	//生成token
-	maxAge:=60*60*24
+	//maxAge:=60
 	// Create the Claims
 	//claims := &jwt.StandardClaims{
 	//	//	ExpiresAt: time.Now().Add(time.Duration(maxAge)*time.Second).Unix(), // 过期时间，必须设置,
@@ -23,19 +22,19 @@ func main() {
 	//	//}
 
 	//或者用下面自定义claim
-	claims := jwt.MapClaims{
-		"id":       11,
-		"name":       "jerry",
-		"exp": time.Now().Add(time.Duration(maxAge)*time.Second).Unix(), // 过期时间，必须设置,
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(SECRETKEY))
-	if err!=nil {
-		fmt.Println(err)
-	}
-	fmt.Printf("token: %v\n", tokenString)
-
+	//claims := jwt.MapClaims{
+	//	"id":       11,
+	//	"name":       "jerry",
+	//	"exp": time.Now().Add(time.Duration(maxAge)*time.Second).Unix(), // 过期时间，必须设置,
+	//}
+	//
+	//token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	//tokenString, err := token.SignedString([]byte(SECRETKEY))
+	//if err!=nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Printf("token: %v\n", tokenString)
+	tokenString :="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTExNjgyMTUsImlkIjoxMSwibmFtZSI6ImplcnJ5In0.Ll7BEuYakOocFpZ4I1l1hcnaW0TGeK79hxHp-s9naO4"
 	//解析token
 	ret,err :=ParseToken(tokenString)
 	if err!=nil {
@@ -61,3 +60,4 @@ func ParseToken(tokenString string)(jwt.MapClaims,error)  {
 		return nil,err
 	}
 }
+

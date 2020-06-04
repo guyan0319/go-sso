@@ -14,5 +14,6 @@ var cn = map[string]string{
 	"mobile_exists":    "手机号已存在",
 	"mobile_not_exists":    "手机号已存在",
 	"role_error":    "角色不存在",
-	"unauthorized":    "账户未授权",
+	"access_token":    "access token不存在或失效",
+	"refresh_token":    "refresh token不存在或失效",
 }

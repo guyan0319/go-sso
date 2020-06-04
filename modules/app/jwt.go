@@ -7,6 +7,7 @@ import (
 
 const (
 	SECRETKEY = "42wqTE23123wffLU94342wgldgFs"
+	MAXAGE=3600*24
 )
 
 type CustomClaims struct {
@@ -31,4 +32,10 @@ func ParseToken(tokenString string)(*CustomClaims,error)  {
 	} else {
 		return nil,err
 	}
+}
+//加入到黑名单
+func Black(  token string ) {
+
+
+
 }

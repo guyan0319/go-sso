@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-sso/api"
 	"go-sso/api/user"
@@ -9,8 +8,8 @@ import (
 	"go-sso/modules/app"
 	"go-sso/utils/common"
 	"go-sso/utils/handle"
+	"go-sso/utils/request"
 	"go-sso/utils/response"
-	"log"
 	"net/url"
 )
 
@@ -22,7 +21,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode) //线上环境
 	r := gin.Default()
 	r.Use(Auth)
-	r.POST("/renewal", user.Logout)
+	r.POST("/renewal", user.Renewal)
 	r.POST("/logout", user.Logout)
 	r.POST("/login", user.Login)
 	r.POST("/login/mobile", user.LoginByMobileCode)
@@ -57,8 +56,8 @@ func Auth(c *gin.Context){
 	}
 	//开启jwt
 	if conf.Cfg.OpenJwt{
-		accessToken,err:=c.Cookie(app.ACCESS_TOKEN)
-		if err !=nil {
+		accessToken,has:=request.GetParam(c,app.ACCESS_TOKEN)
+		if has {
 			response.ShowError(c,"nologin")
 			return
 		}
@@ -67,65 +66,14 @@ func Auth(c *gin.Context){
 			response.ShowValidatorError(c,err)
 			return
 		}
-
-
-
-
+		c.Set("uid",ret.Id)
 	}
-	fmt.Println(u)
+	//cookie
 	_,err=c.Cookie(app.COOKIE_TOKEN)
-	if err==nil {
-			c.Next()
-			return
-	}
-
-	//
-
-
-    //id,err:=c.Cookie(app.COOKIE_TOKEN)
-    //if err!=nil{
-	//	panic(err)
-	//}
-	//if id!="" {
-	//
-	//}
-
-
-
-
-	//session := sessions.Default(c)
-	//v := session.Get(conf.Cfg.Token)
-	//if v==nil {
-	//	c.Abort()
-	//	response.ShowError(c,"nologin")
-	//	return
-	//}
-	//uid:=session.Get(v)
-	//users := models.SystemUser{Id:uid.(int),Status:1}
-	//has:=users.GetRow()
-	//if !has {
-	//	c.Abort()
-	//	response.ShowError(c,"user_error")
-	//	return
-	//}
-	////特殊账号
-	//if users.Name==conf.Cfg.Super {
-		c.Next()
+	if err!=nil {
+		response.ShowError(c,"nologin")
 		return
-	//}
-	//menuModel:=models.SystemMenu{}
-	//menuMap,err:=menuModel.GetRouteByUid(uid)
-	//if err!=nil {
-	//	c.Abort()
-	//	response.ShowError(c,"unauthorized")
-	//	return
-	//}
-	//if _,ok:=menuMap[u.Path] ;!ok{
-	//	c.Abort()
-	//	response.ShowError(c,"unauthorized")
-	//	return
-	//}
-	// access the status we are sending
-	status := c.Writer.Status()
-	log.Println(status) //状态 200
+	}
+	c.Next()
+	return
 }
