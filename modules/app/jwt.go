@@ -3,11 +3,13 @@ package app
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"go-sso/utils/cache"
 )
 
 const (
 	SECRETKEY = "42wqTE23123wffLU94342wgldgFs"
 	MAXAGE=3600*24
+	CACHEBLACKTOKEN=""
 )
 
 type CustomClaims struct {
@@ -34,8 +36,20 @@ func ParseToken(tokenString string)(*CustomClaims,error)  {
 	}
 }
 //加入到黑名单
-func Black(  token string ) {
+func AddBlack( key, token string ) (err error) {
+	key = cache.RedisSuf + key
+	// 从池里获取连接
+	rc := cache.RedisClient.Get()
+	// 用完后将连接放回连接池
+	defer rc.Close()
+	_, err= rc.Do("Set", key, token, "EX", MAXAGE)
+	if err != nil {
+		return
+	}
+	return
 
 
+}
+func CheckBlack(key,token string)  {
 
 }
