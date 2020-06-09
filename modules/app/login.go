@@ -46,6 +46,7 @@ func DoLogin(c *gin.Context,user models.Users)  error{
 
 	return nil
 }
+//判断是否https
 func IsHttps(c *gin.Context) bool {
 	if c.GetHeader(HEADER_FORWARDED_PROTO) =="https" || c.Request.TLS!=nil{
 		return true

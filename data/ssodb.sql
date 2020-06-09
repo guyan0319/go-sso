@@ -65,7 +65,7 @@ CREATE TABLE `users` (
   `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户名',
   `email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '邮箱',
   `mobile` varchar(20) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '手机号',
-  `passwd` varchar(20) COLLATE utf8mb4_general_ci NOT NULL COMMENT '密码',
+  `passwd` varchar(40) COLLATE utf8mb4_general_ci NOT NULL COMMENT '密码',
   `salt` char(4) COLLATE utf8mb4_general_ci NOT NULL COMMENT '盐值',
   `ext` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '扩展字段',
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态（0：未审核,1:通过 10删除）',

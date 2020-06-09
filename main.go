@@ -29,6 +29,7 @@ func main() {
 	r.POST("/signup/mobile", user.SignupByMobile)
 	r.POST("/signup/mobile/exist", user.MobileIsExists)
 	r.GET("/", api.Index)
+	r.GET("/my/info", user.Info)//用户信息
 	r.GET("/pong", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
@@ -57,20 +58,31 @@ func Auth(c *gin.Context){
 	//开启jwt
 	if conf.Cfg.OpenJwt{
 		accessToken,has:=request.GetParam(c,app.ACCESS_TOKEN)
-		if has {
+		if !has {
+			c.Abort()//组织调起其他函数
 			response.ShowError(c,"nologin")
 			return
 		}
 		ret,err:= app.ParseToken(accessToken)
 		if err!=nil {
+			c.Abort()
 			response.ShowValidatorError(c,err)
 			return
 		}
-		c.Set("uid",ret.Id)
+		has=app.CheckBlack(ret.Id,accessToken)
+		if has {
+			c.Abort()//组织调起其他函数
+			response.ShowError(c,"access_token")
+			return
+		}
+		c.Set("uid",ret.UserId)
+		c.Next()
+		return
 	}
 	//cookie
 	_,err=c.Cookie(app.COOKIE_TOKEN)
 	if err!=nil {
+		c.Abort()//组织调起其他函数
 		response.ShowError(c,"nologin")
 		return
 	}

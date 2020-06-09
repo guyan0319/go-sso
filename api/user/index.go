@@ -49,12 +49,14 @@ func Login(c *gin.Context) {
 		response.ShowValidatorError(c, msg)
 		return
 	}
+	fmt.Println(userMobile.Mobile)
 	model := models.Users{Mobile: userMobile.Mobile}
 	if has := model.GetRow(); !has {
 		response.ShowError(c, "mobile_not_exists")
 		return
 	}
-	if common.Sha1En(userMobile.Passwd+model.Salt) != common.Sha1En(model.Passwd+model.Salt) {
+	fmt.Println(model)
+	if common.Sha1En(userMobile.Passwd+model.Salt) != model.Passwd {
 		response.ShowError(c, "login_error")
 		return
 	}
@@ -68,14 +70,17 @@ func Login(c *gin.Context) {
 	return
 }
 
-//退出登录
+//注销登录
 func Logout(c *gin.Context) {
 	secure := app.IsHttps(c)
+	//access_token  refresh_token 加黑名单
+	accessToken, has := request.GetParam(c, app.ACCESS_TOKEN)
+	if has {
+		app.AddBlack(c.MustGet("uid").(string), accessToken)
+	}
 	c.SetCookie(app.COOKIE_TOKEN, "", -1, "/", "", secure, true)
 	c.SetCookie(app.ACCESS_TOKEN, "", -1, "/", "", secure, true)
 	c.SetCookie(app.REFRESH_TOKEN, "", -1, "/", "", secure, true)
-	//access_token  refresh_token 加黑名单
-
 	response.ShowSuccess(c, "success")
 	return
 }
@@ -90,10 +95,10 @@ func LoginByMobileCode(c *gin.Context) {
 		return
 	}
 	//验证code
-	if sms.SmsCheck("code"+userMobile.Mobile, userMobile.Code) {
-		response.ShowError(c, "code_error")
-		return
-	}
+	//if sms.SmsCheck("code"+userMobile.Mobile, userMobile.Code) {
+	//	response.ShowError(c, "code_error")
+	//	return
+	//}
 	model := models.Users{Mobile: userMobile.Mobile}
 	if has := model.GetRow(); !has {
 		response.ShowError(c, "mobile_not_exists")
@@ -185,14 +190,7 @@ func SignupByMobile(c *gin.Context) {
 	traceModel.Type = models.TraceTypeReg
 
 	deviceModel := models.Device{Ctime: model.Ctime, Ip: traceModel.Ip, Client: c.GetHeader("User-Agent")}
-
 	_, err := model.Add(&traceModel, &deviceModel)
-	if err != nil {
-		fmt.Println(err)
-		response.ShowError(c, "fail")
-		return
-	}
-	err = app.DoLogin(c, model)
 	if err != nil {
 		fmt.Println(err)
 		response.ShowError(c, "fail")
@@ -209,50 +207,67 @@ func Renewal(c *gin.Context) {
 		response.ShowValidatorError(c, "access token not found")
 		return
 	}
-	_,err:=app.ParseToken(accessToken)
-	if err==nil{
-		response.ShowData(c,"success")
+	_, err := app.ParseToken(accessToken)
+	if err == nil {
+		response.ShowData(c, "success")
 		return
 	}
 	refreshToken, has := request.GetParam(c, app.REFRESH_TOKEN)
 	if !has {
-		response.ShowError(c,"access_token")
+		response.ShowError(c, "access_token")
 		return
 	}
-	ret,err:=app.ParseToken(refreshToken)
-	if err!=nil {
-		response.ShowError(c,"refresh_token")
+	ret, err := app.ParseToken(refreshToken)
+	if err != nil {
+		response.ShowError(c, "refresh_token")
 		return
 	}
-	id,_:=strconv.Atoi(ret.Id)
-	customClaims :=&app.CustomClaims{
-		UserId:        int64(id),
+	id, _ := strconv.Atoi(ret.Id)
+	customClaims := &app.CustomClaims{
+		UserId: int64(id),
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Duration(app.MAXAGE)*time.Second).Unix(), // 过期时间，必须设置
+			ExpiresAt: time.Now().Add(time.Duration(app.MAXAGE) * time.Second).Unix(), // 过期时间，必须设置
 		},
 	}
-	accessToken,err=customClaims.MakeToken()
+	accessToken, err = customClaims.MakeToken()
 	if err != nil {
-		response.ShowError(c,"fail")
+		response.ShowError(c, "fail")
 		return
 	}
-	customClaims =&app.CustomClaims{
-		UserId:        int64(id),
+	customClaims = &app.CustomClaims{
+		UserId: int64(id),
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Duration(app.MAXAGE+1800)*time.Second).Unix(), // 过期时间，必须设置
+			ExpiresAt: time.Now().Add(time.Duration(app.MAXAGE+1800) * time.Second).Unix(), // 过期时间，必须设置
 		},
 	}
-	refreshToken,err=customClaims.MakeToken()
+	refreshToken, err = customClaims.MakeToken()
 	if err != nil {
-		response.ShowError(c,"fail")
+		response.ShowError(c, "fail")
 		return
 	}
-	c.Header(app.ACCESS_TOKEN,accessToken)
-	c.Header(app.REFRESH_TOKEN,refreshToken)
-	secure:=app.IsHttps(c)
-	c.SetCookie(app.ACCESS_TOKEN,accessToken,app.MAXAGE,"/", "",	 secure,true)
-	c.SetCookie(app.REFRESH_TOKEN,refreshToken,app.MAXAGE,"/", "",	 secure,true)
+	c.Header(app.ACCESS_TOKEN, accessToken)
+	c.Header(app.REFRESH_TOKEN, refreshToken)
+	secure := app.IsHttps(c)
+	c.SetCookie(app.ACCESS_TOKEN, accessToken, app.MAXAGE, "/", "", secure, true)
+	c.SetCookie(app.REFRESH_TOKEN, refreshToken, app.MAXAGE, "/", "", secure, true)
 
-	response.ShowError(c,"success")
+	response.ShowError(c, "success")
+	return
+}
+func Info(c *gin.Context)  {
+	uid:=c.MustGet("uid").(int64)
+	fmt.Println(uid)
+	model:=models.Users{}
+	model.Id=uid
+	row,err:=model.GetRowById()
+	if err!=nil {
+		fmt.Println(err)
+		response.ShowValidatorError(c, err)
+		return
+	}
+	//隐藏手机号中间数字
+	s :=row.Mobile
+	row.Mobile =string([]byte(s)[0:3])+"****"+string([]byte(s)[7])
+	response.ShowData(c,row)
 	return
 }

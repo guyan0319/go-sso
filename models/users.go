@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 )
-
 type Users struct {
 	Ctime  int       `json:"ctime" xorm:"not null default 0 comment('创建时间') index INT(10)"`
 	Email  string    `json:"email" xorm:"not null default '' comment('邮箱') VARCHAR(100)"`
@@ -16,11 +15,18 @@ type Users struct {
 	Salt   string    `json:"salt" xorm:"not null comment('盐值') CHAR(4)"`
 	Status int       `json:"status" xorm:"not null default 0 comment('状态（0：未审核,1:通过 10删除）') TINYINT(4)"`
 }
+type UserRow struct {
+	Id     int64     `json:"id" xorm:"pk autoincr comment('主键') BIGINT(20)"`
+	Name   string    `json:"name" xorm:"not null default '' comment('用户名') VARCHAR(50)"`
+	Email  string    `json:"email" xorm:"not null default '' comment('邮箱') VARCHAR(100)"`
+	Mobile  string    `json:"mobile" xorm:"not null default '' comment('手机号') VARCHAR(20)"`
 
+}
 var UsersStatusOk = 1
 var UsersStatusDel = 10
 var UsersStatusDef = 0
 
+var usersTable = "users"
 func (u *Users) GetRow() bool {
 	has, err := mEngine.Get(u)
 	if err == nil && has {
@@ -61,4 +67,9 @@ func (u *Users) Add(trace *Trace, device *Device) (int64, error) {
 func IsExistsMobile(mobile string) bool {
 	model := Users{Mobile: mobile}
 	return model.GetRow()
+}
+func(u *Users) GetRowById() ([]UserRow,error) {
+	var userRow []UserRow
+	err := mEngine.Table(usersTable).Where("id=?",u.Id).Find(&userRow)
+	return userRow,err
 }

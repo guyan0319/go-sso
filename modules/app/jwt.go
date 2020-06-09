@@ -49,6 +49,7 @@ func AddBlack( key, token string ) (err error) {
 	}
 	return
 }
+//检查token是否在黑名单
 func CheckBlack(key,token string)bool  {
 	key = cache.RedisSuf + CACHE_BLACK_TOKEN+ key
 	// 从池里获取连接

@@ -25,7 +25,7 @@ func  Set(cfg Config) {
 	Cfg.Language=setDefault(cfg.Language,"","cn")
 	Cfg.Token=setDefault(cfg.Token,"","token")
 	Cfg.Super=setDefault(cfg.Super,"","admin")//超级账户
-	Cfg.Host=setDefault(cfg.Host,"","http://localhost:8090")//域名
+	Cfg.Host=setDefault(cfg.Host,"","http://localhost:8282")//域名
 	Cfg.Routes=cfg.Routes
 	Cfg.OpenJwt=cfg.OpenJwt
 	mutex.Unlock()
