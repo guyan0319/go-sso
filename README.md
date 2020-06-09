@@ -110,6 +110,6 @@ Content-Length: 28
 获取用户信息
 
 ```
- curl -X GET "http://127.0.0.1:8282/my/info" --cookie "Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MTY2OX0.xFcbRM1NxohURT0PZ7NCnxoqoZY1-TdgFNnisd_jyMQ"
+ curl "http://127.0.0.1:8282/my/info" -b "Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MTY2OX0.xFcbRM1NxohURT0PZ7NCnxoqoZY1-TdgFNnisd_jyMQ"
 ```
 
