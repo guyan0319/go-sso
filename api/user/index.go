@@ -76,7 +76,8 @@ func Logout(c *gin.Context) {
 	//access_token  refresh_token 加黑名单
 	accessToken, has := request.GetParam(c, app.ACCESS_TOKEN)
 	if has {
-		app.AddBlack(c.MustGet("uid").(string), accessToken)
+		uid := strconv.FormatInt(c.MustGet("uid").(int64),10)
+		app.AddBlack(uid, accessToken)
 	}
 	c.SetCookie(app.COOKIE_TOKEN, "", -1, "/", "", secure, true)
 	c.SetCookie(app.ACCESS_TOKEN, "", -1, "/", "", secure, true)
@@ -265,9 +266,11 @@ func Info(c *gin.Context)  {
 		response.ShowValidatorError(c, err)
 		return
 	}
+	fmt.Println(row)
+	fmt.Println(row.Name)
 	//隐藏手机号中间数字
 	s :=row.Mobile
-	row.Mobile =string([]byte(s)[0:3])+"****"+string([]byte(s)[7])
+	row.Mobile =string([]byte(s)[0:3])+"****"+string([]byte(s)[6:])
 	response.ShowData(c,row)
 	return
 }

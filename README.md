@@ -54,7 +54,7 @@ sql文件在data目录下，新建数据库名，通过mysql管理工具或登�
 注册手机号
 
 ```
-$ curl -X POST "http://127.0.0.1:8282/signup/mobile"  -i -d '{"mobile":"1352227564","passwd":"123456","code": "111111"}'
+$ curl -X POST "http://127.0.0.1:8282/signup/mobile"  -i -d '{"mobile":"13522227564","passwd":"123456","code": "111111"}'
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100    86  100    28  100    58   1750   3625 --:--:-- --:--:-- --:--:-- 86000HTTP/1.1 200 OK
@@ -70,17 +70,17 @@ Content-Length: 28
 手机号+密码 登录
 
 ```
-$ curl -X POST "http://127.0.0.1:8282/login"  -i -d '{"mobile":"1352227564","passwd":"123456"}'
+$ curl -X POST "http://127.0.0.1:8282/login"  -i -d '{"mobile":"13522227564","passwd":"123456"}'
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-100    69  100    28  100    41  28000  41000 --:--:-- --:--:-- --:--:-- 69000HTTP/1.1 200 OK
-Access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MTE3OX0.sBDYL0QKwpF9T-3X7NbwZsqBzTakhqYK54D09xyVgso
+100    69  100    28  100    41    451    661 --:--:-- --:--:-- --:--:--  1112HTTP/1.1 200 OK
+Access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTg1ODIwMX0.OMpRhdX2wXm1BuRmeaZtSH7L3skXhNhYc0YYUTQf7WI
 Content-Type: application/json; charset=utf-8
-Rfresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4Mjk3OX0.NvdyjcsZHpaQQr0hHTWUlo9zTAzOCBvHQUEupsJtje4
-Set-Cookie: Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MTE3OX0.sBDYL0QKwpF9T-3X7NbwZsqBzTakhqYK54D09xyVgso; Path=/; Max-Age=86400; HttpOnly
-Set-Cookie: Rfresh_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4Mjk3OX0.NvdyjcsZHpaQQr0hHTWUlo9zTAzOCBvHQUEupsJtje4; Path=/; Max-Age=86400; HttpOnly
+Rfresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTg2MDAwMX0.Hglo9i8pxFGcRcvMw8mUvXlT2JLrHSC6ocQqJseknq8
+Set-Cookie: Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTg1ODIwMX0.OMpRhdX2wXm1BuRmeaZtSH7L3skXhNhYc0YYUTQf7WI; Path=/; Max-Age=86400; HttpOnly
+Set-Cookie: Rfresh_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTg2MDAwMX0.Hglo9i8pxFGcRcvMw8mUvXlT2JLrHSC6ocQqJseknq8; Path=/; Max-Age=86400; HttpOnly
 Set-Cookie: UserId=1; Path=/; Max-Age=86400; HttpOnly
-Date: Tue, 09 Jun 2020 09:26:19 GMT
+Date: Wed, 10 Jun 2020 06:50:01 GMT
 Content-Length: 28
 
 {"code":200,"msg":"success"}
@@ -90,26 +90,51 @@ Content-Length: 28
 手机号+验证码登录
 
 ```
-$ curl -X POST "http://127.0.0.1:8282/login/mobile"  -i -d '{"mobile":"1352227564","code":"123456"}'
+$ curl -X POST "http://127.0.0.1:8282/login/mobile"  -i -d '{"mobile":"13522227564","code":"123456"}'
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-100    67  100    28  100    39   1750   2437 --:--:-- --:--:-- --:--:--  4187HTTP/1.1 200 OK
-Access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MTY2OX0.xFcbRM1NxohURT0PZ7NCnxoqoZY1-TdgFNnisd_jyMQ
+100    67  100    28  100    39  28000  39000 --:--:-- --:--:-- --:--:-- 67000HTTP/1.1 200 OK
+Access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTg1ODI1M30.-Yf8I1W-0lEjgVx19IYPoEZhMZ-hChlcA51u3k56hQI
 Content-Type: application/json; charset=utf-8
-Rfresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MzQ2OX0.syOp4W45YH2o4IGOBjvyolo6LpNfjbsNaKtN1PIa_gg
-Set-Cookie: Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MTY2OX0.xFcbRM1NxohURT0PZ7NCnxoqoZY1-TdgFNnisd_jyMQ; Path=/; Max-Age=86400; HttpOnly
-Set-Cookie: Rfresh_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MzQ2OX0.syOp4W45YH2o4IGOBjvyolo6LpNfjbsNaKtN1PIa_gg; Path=/; Max-Age=86400; HttpOnly
+Rfresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTg2MDA1M30.X1liLjGyJkTAnwag6unTZpbtxXX_9JQWGdp7q4II8ek
+Set-Cookie: Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTg1ODI1M30.-Yf8I1W-0lEjgVx19IYPoEZhMZ-hChlcA51u3k56hQI; Path=/; Max-Age=86400; HttpOnly
+Set-Cookie: Rfresh_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTg2MDA1M30.X1liLjGyJkTAnwag6unTZpbtxXX_9JQWGdp7q4II8ek; Path=/; Max-Age=86400; HttpOnly
 Set-Cookie: UserId=1; Path=/; Max-Age=86400; HttpOnly
-Date: Tue, 09 Jun 2020 09:34:29 GMT
+Date: Wed, 10 Jun 2020 06:50:53 GMT
 Content-Length: 28
 
 {"code":200,"msg":"success"}
+
 
 ```
 
 获取用户信息
 
 ```
- curl "http://127.0.0.1:8282/my/info" -b "Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MTY2OX0.xFcbRM1NxohURT0PZ7NCnxoqoZY1-TdgFNnisd_jyMQ"
+$  curl "http://127.0.0.1:8282/my/info" -b "Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MTY2OX0.xFcbRM1NxohURT0PZ7NCnxoqoZY1-TdgFNnisd_jyMQ"
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    72  100    72    0     0    774      0 --:--:-- --:--:-- --:--:--   774{"code":200,"data":{"id":1,"name":"","email":"","mobile":"135****7564"}}
+```
+
+查看手机号是否存在
+
+```
+$  curl -X POST "http://127.0.0.1:8282/signup/mobile/exist"  -i -d '{"mobile":"13522227564"}'
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    61  100    37  100    24  37000  24000 --:--:-- --:--:-- --:--:-- 61000HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Wed, 10 Jun 2020 07:40:50 GMT
+Content-Length: 37
+
+{"code":200,"data":{"is_exist":true}}
+
+```
+
+登出系统
+
+```
+curl -X POST "http://127.0.0.1:8282/logout" -b "Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjEsImV4cCI6MTU5MTc4MTY2OX0.xFcbRM1NxohURT0PZ7NCnxoqoZY1-TdgFNnisd_jyMQ"
 ```
 

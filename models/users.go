@@ -68,8 +68,8 @@ func IsExistsMobile(mobile string) bool {
 	model := Users{Mobile: mobile}
 	return model.GetRow()
 }
-func(u *Users) GetRowById() ([]UserRow,error) {
-	var userRow []UserRow
-	err := mEngine.Table(usersTable).Where("id=?",u.Id).Find(&userRow)
+func(u *Users) GetRowById() (UserRow,error) {
+	var userRow UserRow
+	_,err := mEngine.Table(usersTable).Where("id=?",u.Id).Get(&userRow)
 	return userRow,err
 }
