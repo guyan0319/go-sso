@@ -45,24 +45,20 @@ func Login(c *gin.Context) {
 	var userMobile UserMobilePasswd
 	if err := c.BindJSON(&userMobile); err != nil {
 		msg := handle.TransTagName(&UserMobileTrans, err)
-		fmt.Println(msg)
 		response.ShowValidatorError(c, msg)
 		return
 	}
-	fmt.Println(userMobile.Mobile)
 	model := models.Users{Mobile: userMobile.Mobile}
 	if has := model.GetRow(); !has {
 		response.ShowError(c, "mobile_not_exists")
 		return
 	}
-	fmt.Println(model)
 	if common.Sha1En(userMobile.Passwd+model.Salt) != model.Passwd {
 		response.ShowError(c, "login_error")
 		return
 	}
 	err := app.DoLogin(c, model)
 	if err != nil {
-		fmt.Println(err)
 		response.ShowError(c, "fail")
 		return
 	}
@@ -208,14 +204,9 @@ func Renewal(c *gin.Context) {
 		response.ShowValidatorError(c, "access token not found")
 		return
 	}
-	_, err := app.ParseToken(accessToken)
-	if err == nil {
-		response.ShowData(c, "success")
-		return
-	}
 	refreshToken, has := request.GetParam(c, app.REFRESH_TOKEN)
 	if !has {
-		response.ShowError(c, "access_token")
+		response.ShowError(c, "refresh_token")
 		return
 	}
 	ret, err := app.ParseToken(refreshToken)
@@ -223,9 +214,20 @@ func Renewal(c *gin.Context) {
 		response.ShowError(c, "refresh_token")
 		return
 	}
-	id, _ := strconv.Atoi(ret.Id)
+	//uid := strconv.FormatInt(ret.UserId,10)
+	//has=app.CheckBlack(uid,accessToken)
+	//if has {
+	//	c.Abort()//组织调起其他函数
+	//	response.ShowError(c,"nologin")
+	//	return
+	//}
+	//_, err= app.ParseToken(accessToken)
+	//if err == nil {
+	//	response.ShowError(c, "access_token_ok")
+	//	return
+	//}
 	customClaims := &app.CustomClaims{
-		UserId: int64(id),
+		UserId: ret.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Duration(app.MAXAGE) * time.Second).Unix(), // 过期时间，必须设置
 		},
@@ -236,7 +238,7 @@ func Renewal(c *gin.Context) {
 		return
 	}
 	customClaims = &app.CustomClaims{
-		UserId: int64(id),
+		UserId: ret.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Duration(app.MAXAGE+1800) * time.Second).Unix(), // 过期时间，必须设置
 		},
@@ -251,7 +253,7 @@ func Renewal(c *gin.Context) {
 	secure := app.IsHttps(c)
 	c.SetCookie(app.ACCESS_TOKEN, accessToken, app.MAXAGE, "/", "", secure, true)
 	c.SetCookie(app.REFRESH_TOKEN, refreshToken, app.MAXAGE, "/", "", secure, true)
-
+	fmt.Println("ok")
 	response.ShowError(c, "success")
 	return
 }

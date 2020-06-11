@@ -37,7 +37,7 @@ func ParseToken(tokenString string)(*CustomClaims,error)  {
 	}
 }
 //加入到黑名单
-func AddBlack( key, token string ) (err error) {
+func AddBlack( key , token string ) (err error) {
 	key = cache.RedisSuf + CACHE_BLACK_TOKEN+ key
 	// 从池里获取连接
 	rc := cache.RedisClient.Get()

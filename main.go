@@ -11,6 +11,7 @@ import (
 	"go-sso/utils/request"
 	"go-sso/utils/response"
 	"net/url"
+	"strconv"
 )
 
 func main() {
@@ -66,13 +67,14 @@ func Auth(c *gin.Context){
 		ret,err:= app.ParseToken(accessToken)
 		if err!=nil {
 			c.Abort()
-			response.ShowValidatorError(c,err)
+			response.ShowValidatorError(c,err.Error())
 			return
 		}
-		has=app.CheckBlack(ret.Id,accessToken)
+		uid := strconv.FormatInt(ret.UserId,10)
+		has=app.CheckBlack(uid,accessToken)
 		if has {
 			c.Abort()//组织调起其他函数
-			response.ShowError(c,"access_token")
+			response.ShowError(c,"nologin")
 			return
 		}
 		c.Set("uid",ret.UserId)

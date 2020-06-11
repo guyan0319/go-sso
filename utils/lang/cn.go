@@ -16,4 +16,5 @@ var cn = map[string]string{
 	"role_error":    "角色不存在",
 	"access_token":    "access token不存在或失效",
 	"refresh_token":    "refresh token不存在或失效",
+	"access_token_ok":    "access token在有效期",
 }
